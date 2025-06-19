@@ -53,6 +53,13 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
+                    {% if not user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'publico_mascotas' %}">
+                            <i class="fas fa-globe me-1"></i>Vista Pública
+                        </a>
+                    </li>
+                    {% endif %}
                     {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'vista_mascotas' %}">

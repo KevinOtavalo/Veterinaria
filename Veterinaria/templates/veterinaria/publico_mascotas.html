@@ -1,0 +1,72 @@
+{% extends 'veterinaria/base.html' %}
+
+{% block title %}Mascotas Públicas - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Información de la veterinaria -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body text-center">
+                <h2 class="mb-3 text-primary"><i class="fas fa-clinic-medical me-2"></i>Veterinaria San Francisco</h2>
+                <p class="lead mb-3">Cuidando a tus mascotas con profesionalismo y cariño desde 1998.</p>
+                <div class="mb-2">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    <strong>Dirección:</strong> Av. Siempre Viva 123, Ciudad, País
+                </div>
+                <div class="mb-2">
+                    <i class="fas fa-envelope me-2"></i>
+                    <strong>Email:</strong> contacto@veterinariasanfrancisco.com
+                </div>
+                <div class="mb-2">
+                    <i class="fas fa-phone me-2"></i>
+                    <strong>Teléfono:</strong> +56 9 1234 5678
+                </div>
+                <div class="mb-2">
+                    <i class="fas fa-clock me-2"></i>
+                    <strong>Horario:</strong> Lunes a Sábado, 9:00 a 19:00 hrs
+                </div>
+                <hr>
+                <p class="mb-0 text-muted">
+                    En nuestra veterinaria ofrecemos atención médica, vacunación, consultas, y mucho más para el bienestar de tus mascotas. ¡Visítanos o contáctanos para más información!
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mb-5">
+            <h1 class="display-5 text-primary mb-3">
+                <i class="fas fa-paw me-2"></i>Mascotas Registradas
+            </h1>
+            <p class="lead text-muted">
+                Este es un listado público de mascotas registradas en la veterinaria. ¡Conoce a nuestros amigos peludos!
+            </p>
+        </div>
+
+        {% if mascotas %}
+            <div class="row g-4">
+                {% for mascota in mascotas %}
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <h4 class="card-title mb-2 text-primary">
+                                <i class="fas fa-dog me-2"></i>{{ mascota.nombre }}
+                            </h4>
+                            <p class="mb-1">
+                                <span class="badge bg-info">{{ mascota.especie }}</span>
+                            </p>
+                            <p class="mb-1 text-muted">
+                                <i class="fas fa-tag me-1"></i>Raza: {{ mascota.raza|default:'No especificada' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="fas fa-info-circle me-2"></i>No hay mascotas registradas aún.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

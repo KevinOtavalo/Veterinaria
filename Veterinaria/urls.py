@@ -31,5 +31,6 @@ urlpatterns = [
     path('mascota/<int:mascota_id>/consultas/',
          views.detalle_consultas, name='detalle_consultas'),
     path('mascotas/todas/', views.vista_mascotas_todas,
-         name='vista_mascotas_todas')
+         name='vista_mascotas_todas'),
+    path('publico/', views.publico_mascotas, name='publico_mascotas'),
 ]

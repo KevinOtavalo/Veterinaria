@@ -49,9 +49,9 @@ class LoginIndexView(LoginView):
     template_name = 'veterinaria/login_index.html'
 
 
-@login_required
 def vista_publica(request):
-    return redirect('vista_mascotas')
+    mascotas = Mascota.objects.all()
+    return render(request, 'veterinaria/publico_mascotas.html', {'mascotas': mascotas})
 
 
 @login_required
@@ -276,3 +276,8 @@ def detalle_consultas(request, mascota_id):
 def vista_mascotas_todas(request):
     mascotas = Mascota.objects.all()
     return render(request, 'veterinaria/vista_mascotas_todas.html', {'mascotas': mascotas})
+
+
+def publico_mascotas(request):
+    mascotas = Mascota.objects.all()
+    return render(request, 'veterinaria/publico_mascotas.html', {'mascotas': mascotas})

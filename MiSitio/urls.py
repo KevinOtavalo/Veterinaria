@@ -17,13 +17,13 @@ Including another URLconf
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 from django.contrib import admin
-from Veterinaria.views import LoginIndexView
+from Veterinaria.views import LoginIndexView, vista_publica
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/login/', LoginIndexView.as_view(), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(),
          name='logout'),
-    path('', LoginIndexView.as_view()),
+    path('', vista_publica, name='home'),
     path('veterinaria/', include('Veterinaria.urls')),
 ]
