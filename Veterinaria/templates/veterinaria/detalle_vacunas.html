@@ -1,0 +1,116 @@
+{% extends 'veterinaria/base.html' %}
+
+{% block title %}Vacunas de {{ mascota.nombre }} - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'vista_mascotas' %}">Mis Mascotas</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'detalle_mascota' mascota.id %}">{{ mascota.nombre }}</a></li>
+                        <li class="breadcrumb-item active">Vacunas</li>
+                    </ol>
+                </nav>
+                <h2 class="mb-1">
+                    <i class="fas fa-syringe me-2 text-info"></i>Vacunas de {{ mascota.nombre }}
+                </h2>
+                <p class="text-muted mb-0">Historial de vacunas aplicadas</p>
+            </div>
+            <div class="d-flex gap-2">
+                {% if user.is_staff %}
+                    <a href="{% url 'registrar_vacuna' mascota.id %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Nueva Vacuna
+                    </a>
+                {% endif %}
+                <a href="{% url 'detalle_mascota' mascota.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver
+                </a>
+            </div>
+        </div>
+
+        {% if vacunas %}
+            <div class="row g-4">
+                {% for vacuna in vacunas %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ vacuna.nombre }}</h6>
+                                {% if user.is_staff %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" href="{% url 'editar_vacuna' vacuna.id %}">
+                                                <i class="fas fa-edit me-2"></i>Editar
+                                            </a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'eliminar_vacuna' vacuna.id %}">
+                                                <i class="fas fa-trash me-2"></i>Eliminar
+                                            </a></li>
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="card-text mb-2">
+                                    <i class="fas fa-calendar me-2 text-muted"></i>
+                                    <strong>Fecha de Aplicación:</strong><br>
+                                    {{ vacuna.fecha_aplicacion|date:"d/m/Y" }}
+                                </p>
+                                <p class="card-text mb-0">
+                                    <i class="fas fa-clock me-2 text-muted"></i>
+                                    <strong>Aplicada hace:</strong><br>
+                                    {% if vacuna.fecha_aplicacion %}
+                                        {% if vacuna.fecha_aplicacion|timesince == "0 minutos" %}
+                                            Hoy
+                                        {% else %}
+                                            {{ vacuna.fecha_aplicacion|timesince }}
+                                        {% endif %}
+                                    {% else %}
+                                        No especificada
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            {% if user.is_staff %}
+                                <div class="d-grid gap-2">
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'editar_vacuna' vacuna.id %}" class="btn btn-outline-info btn-sm">
+                                            <i class="fas fa-edit me-1"></i>Editar
+                                        </a>
+                                        <a href="{% url 'eliminar_vacuna' vacuna.id %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash me-1"></i>Eliminar
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-syringe fa-4x text-muted"></i>
+                </div>
+                <h4 class="text-muted mb-3">No hay vacunas registradas</h4>
+                <p class="text-muted mb-4">Aún no se han registrado vacunas para {{ mascota.nombre }}.</p>
+                {% if user.is_staff %}
+                    <a href="{% url 'registrar_vacuna' mascota.id %}" class="btn btn-success btn-lg">
+                        <i class="fas fa-plus me-2"></i>Registrar Primera Vacuna
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

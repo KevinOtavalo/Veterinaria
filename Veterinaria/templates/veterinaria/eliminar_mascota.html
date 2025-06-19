@@ -1,0 +1,89 @@
+{% extends 'veterinaria/base.html' %}
+
+{% block title %}Eliminar {{ mascota.nombre }} - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <!-- Header de la página -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-trash me-2 text-danger"></i>Eliminar Mascota
+                </h2>
+                <p class="text-muted mb-0">Confirmar eliminación</p>
+            </div>
+            <a href="{% url 'detalle_mascota' mascota.id %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+        </div>
+
+        <!-- Tarjeta de confirmación -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Eliminación
+                </h5>
+            </div>
+            <div class="card-body p-4 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-paw fa-4x text-danger mb-3"></i>
+                    <h4 class="text-danger mb-3">¿Estás seguro?</h4>
+                    <p class="lead mb-3">
+                        Estás a punto de eliminar la mascota <strong>"{{ mascota.nombre }}"</strong>
+                    </p>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer. 
+                        Se eliminarán todos los datos asociados a esta mascota.
+                    </div>
+                </div>
+
+                <!-- Información de la mascota -->
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title">
+                            <i class="fas fa-info-circle me-2"></i>Información de la Mascota
+                        </h6>
+                        <div class="row text-start">
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <i class="fas fa-tag me-2 text-muted"></i>
+                                    <strong>Nombre:</strong> {{ mascota.nombre }}
+                                </p>
+                                <p class="mb-2">
+                                    <i class="fas fa-dog me-2 text-muted"></i>
+                                    <strong>Especie:</strong> {{ mascota.especie }}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <i class="fas fa-tag me-2 text-muted"></i>
+                                    <strong>Raza:</strong> {{ mascota.raza }}
+                                </p>
+                                <p class="mb-0">
+                                    <i class="fas fa-calendar me-2 text-muted"></i>
+                                    <strong>Nacimiento:</strong> {{ mascota.fecha_nacimiento|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulario de confirmación -->
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'detalle_mascota' mascota.id %}" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash me-2"></i>Sí, Eliminar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

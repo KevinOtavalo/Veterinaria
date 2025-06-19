@@ -1,0 +1,100 @@
+{% extends 'veterinaria/base.html' %}
+
+{% block title %}Todas las Mascotas - Veterinaria{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <!-- Header de la página -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1">
+                    <i class="fas fa-list-alt me-2 text-primary"></i>Todas las Mascotas
+                </h2>
+                <p class="text-muted mb-0">Panel de administración - Gestión completa de mascotas</p>
+            </div>
+            <a href="{% url 'registrar_mascota' %}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Nueva Mascota
+            </a>
+        </div>
+
+        {% if mascotas %}
+            <!-- Grid de mascotas -->
+            <div class="row g-4">
+                {% for mascota in mascotas %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-light">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">{{ mascota.nombre }}</h6>
+                                <span class="badge bg-primary">{{ mascota.especie }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <p class="card-text mb-2">
+                                    <i class="fas fa-user me-2 text-muted"></i>
+                                    <strong>Dueño:</strong> {{ mascota.dueño.username }}
+                                </p>
+                                <p class="card-text mb-2">
+                                    <i class="fas fa-dog me-2 text-muted"></i>
+                                    <strong>Raza:</strong> {{ mascota.raza }}
+                                </p>
+                                <p class="card-text mb-0">
+                                    <i class="fas fa-calendar me-2 text-muted"></i>
+                                    <strong>Nacimiento:</strong> {{ mascota.fecha_nacimiento|date:"d/m/Y" }}
+                                </p>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'detalle_mascota' mascota.id %}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'editar_mascota' mascota.id %}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'eliminar_mascota' mascota.id %}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'detalle_vacunas' mascota.id %}" class="btn btn-info btn-sm">
+                                        <i class="fas fa-syringe me-1"></i>Vacunas
+                                    </a>
+                                    <a href="{% url 'detalle_consultas' mascota.id %}" class="btn btn-secondary btn-sm">
+                                        <i class="fas fa-stethoscope me-1"></i>Consultas
+                                    </a>
+                                </div>
+                                
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'registrar_vacuna' mascota.id %}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-plus me-1"></i>Vacuna
+                                    </a>
+                                    <a href="{% url 'registrar_consulta' mascota.id %}" class="btn btn-warning btn-sm">
+                                        <i class="fas fa-plus me-1"></i>Consulta
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Estado vacío -->
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="fas fa-list-alt fa-4x text-muted"></i>
+                </div>
+                <h4 class="text-muted mb-3">No hay mascotas registradas</h4>
+                <p class="text-muted mb-4">Comienza registrando la primera mascota en el sistema.</p>
+                <a href="{% url 'registrar_mascota' %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>Registrar Primera Mascota
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
