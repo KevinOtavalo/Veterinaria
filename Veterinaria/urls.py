@@ -2,7 +2,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Página principal tras login
     path('', views.vista_publica, name='vista_publica'),
     path('mis-mascotas/', views.vista_mascotas, name='vista_mascotas'),
     path('mascota/registrar/', views.registrar_mascota, name='registrar_mascota'),
@@ -30,7 +29,7 @@ urlpatterns = [
          views.detalle_vacunas, name='detalle_vacunas'),
     path('mascota/<int:mascota_id>/consultas/',
          views.detalle_consultas, name='detalle_consultas'),
-    path('mascotas/todas/', views.vista_mascotas_todas,
-         name='vista_mascotas_todas'),
-    path('publico/', views.publico_mascotas, name='publico_mascotas'),
+
+    # Puedes usar la vista pública con otro nombre si quieres que quede más claro
+    path('publico/', views.vista_publica, name='publico_mascotas'),
 ]

@@ -22,8 +22,6 @@ class MascotaForm(forms.ModelForm):
         if not is_staff:
             self.fields['dueño'].widget = forms.HiddenInput()
             self.fields['dueño'].required = False
-        else:
-            self.fields['dueño'].required = True
 
     def clean_fecha_nacimiento(self):
         fecha = self.cleaned_data['fecha_nacimiento']
@@ -31,6 +29,11 @@ class MascotaForm(forms.ModelForm):
             raise ValidationError(
                 "La fecha de nacimiento no puede ser en el futuro.")
         return fecha
+
+    def clean_dueño(self):
+        if self.instance and self.instance.pk:
+            return self.instance.dueño
+        return self.cleaned_data.get('dueño')
 
 
 class PerfilUsuarioForm(forms.ModelForm):

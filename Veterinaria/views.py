@@ -1,15 +1,12 @@
-from django.shortcuts import render, redirect
-from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.contrib.auth.views import LoginView
 from .models import Mascota, PerfilUsuario, ConsultaVeterinaria, Vacuna
 from .forms import MascotaForm, PerfilUsuarioForm, VacunaForm, ConsultaVeterinariaForm
-from django.contrib import messages
-from django.contrib.auth.views import LoginView
-from django.contrib.admin.views.decorators import staff_member_required
-from django import forms
-from django.contrib.auth.models import User
-from django.urls import reverse_lazy
 
 
 class LoginIndexView(LoginView):
@@ -43,10 +40,6 @@ def dashboard_redirect(request):
         return redirect('vista_mascotas_todas')
     else:
         return redirect('vista_mascotas')
-
-
-class LoginIndexView(LoginView):
-    template_name = 'veterinaria/login_index.html'
 
 
 def vista_publica(request):
@@ -109,13 +102,19 @@ def editar_mascota(request, mascota_id):
         mascota = get_object_or_404(Mascota, id=mascota_id, dueño=request.user)
 
     if request.method == 'POST':
-        form = MascotaForm(request.POST, instance=mascota)
+        form = MascotaForm(request.POST, instance=mascota,
+                           is_staff=request.user.is_staff)
         if form.is_valid():
-            form.save()
+            mascota = form.save(commit=False)
+            # Mantener dueño original para no perderlo
+            mascota.dueño = mascota.dueño or Mascota.objects.get(
+                id=mascota_id).dueño
+            mascota.save()
             messages.success(request, 'Mascota actualizada correctamente.')
             return redirect('vista_mascotas')
     else:
-        form = MascotaForm(instance=mascota)
+        form = MascotaForm(instance=mascota, is_staff=request.user.is_staff)
+
     return render(request, 'veterinaria/editar_mascota.html', {'form': form, 'mascota': mascota})
 
 
@@ -143,14 +142,9 @@ def editar_perfil(request):
     return render(request, 'veterinaria/editar_perfil.html', {'form': form})
 
 
-@login_required
+@staff_member_required
 def registrar_vacuna(request, mascota_id):
     mascota = get_object_or_404(Mascota, id=mascota_id)
-    if mascota.dueño != request.user and not request.user.is_staff:
-        messages.error(
-            request, "No tienes permiso para agregar vacunas a esta mascota.")
-        return redirect('vista_mascotas')
-
     if request.method == 'POST':
         form = VacunaForm(request.POST)
         if form.is_valid():
@@ -163,14 +157,32 @@ def registrar_vacuna(request, mascota_id):
     return render(request, 'veterinaria/registrar_vacuna.html', {'form': form, 'mascota': mascota})
 
 
-@login_required
+@staff_member_required
+def editar_vacuna(request, vacuna_id):
+    vacuna = get_object_or_404(Vacuna, id=vacuna_id)
+    if request.method == 'POST':
+        form = VacunaForm(request.POST, instance=vacuna)
+        if form.is_valid():
+            form.save()
+            return redirect('detalle_mascota', mascota_id=vacuna.mascota.id)
+    else:
+        form = VacunaForm(instance=vacuna)
+    return render(request, 'veterinaria/editar_vacuna.html', {'form': form, 'vacuna': vacuna})
+
+
+@staff_member_required
+def eliminar_vacuna(request, vacuna_id):
+    vacuna = get_object_or_404(Vacuna, id=vacuna_id)
+    if request.method == 'POST':
+        mascota_id = vacuna.mascota.id
+        vacuna.delete()
+        return redirect('detalle_mascota', mascota_id=mascota_id)
+    return render(request, 'veterinaria/eliminar_vacuna.html', {'vacuna': vacuna})
+
+
+@staff_member_required
 def registrar_consulta(request, mascota_id):
     mascota = get_object_or_404(Mascota, id=mascota_id)
-    if mascota.dueño != request.user and not request.user.is_staff:
-        messages.error(
-            request, "No tienes permiso para agregar consultas a esta mascota.")
-        return redirect('vista_mascotas')
-
     if request.method == 'POST':
         form = ConsultaVeterinariaForm(request.POST)
         if form.is_valid():
@@ -183,44 +195,9 @@ def registrar_consulta(request, mascota_id):
     return render(request, 'veterinaria/registrar_consulta.html', {'form': form, 'mascota': mascota})
 
 
-@login_required
-def editar_vacuna(request, vacuna_id):
-    vacuna = get_object_or_404(Vacuna, id=vacuna_id)
-    if vacuna.mascota.dueño != request.user and not request.user.is_staff:
-        messages.error(request, "No tienes permiso para editar esta vacuna.")
-        return redirect('vista_mascotas')
-
-    if request.method == 'POST':
-        form = VacunaForm(request.POST, instance=vacuna)
-        if form.is_valid():
-            form.save()
-            return redirect('detalle_mascota', mascota_id=vacuna.mascota.id)
-    else:
-        form = VacunaForm(instance=vacuna)
-    return render(request, 'veterinaria/editar_vacuna.html', {'form': form, 'vacuna': vacuna})
-
-
-@login_required
-def eliminar_vacuna(request, vacuna_id):
-    vacuna = get_object_or_404(Vacuna, id=vacuna_id)
-    if vacuna.mascota.dueño != request.user and not request.user.is_staff:
-        messages.error(request, "No tienes permiso para eliminar esta vacuna.")
-        return redirect('vista_mascotas')
-
-    if request.method == 'POST':
-        mascota_id = vacuna.mascota.id
-        vacuna.delete()
-        return redirect('detalle_mascota', mascota_id=mascota_id)
-    return render(request, 'veterinaria/eliminar_vacuna.html', {'vacuna': vacuna})
-
-
-@login_required
+@staff_member_required
 def editar_consulta(request, consulta_id):
     consulta = get_object_or_404(ConsultaVeterinaria, id=consulta_id)
-    if consulta.mascota.dueño != request.user and not request.user.is_staff:
-        messages.error(request, "No tienes permiso para editar esta consulta.")
-        return redirect('vista_mascotas')
-
     if request.method == 'POST':
         form = ConsultaVeterinariaForm(request.POST, instance=consulta)
         if form.is_valid():
@@ -231,25 +208,14 @@ def editar_consulta(request, consulta_id):
     return render(request, 'veterinaria/editar_consulta.html', {'form': form, 'consulta': consulta})
 
 
-@login_required
+@staff_member_required
 def eliminar_consulta(request, consulta_id):
     consulta = get_object_or_404(ConsultaVeterinaria, id=consulta_id)
-    if consulta.mascota.dueño != request.user and not request.user.is_staff:
-        messages.error(
-            request, "No tienes permiso para eliminar esta consulta.")
-        return redirect('vista_mascotas')
-
     if request.method == 'POST':
         mascota_id = consulta.mascota.id
         consulta.delete()
         return redirect('detalle_mascota', mascota_id=mascota_id)
     return render(request, 'veterinaria/eliminar_consulta.html', {'consulta': consulta})
-
-
-@staff_member_required
-def vista_mascotas_todas(request):
-    mascotas = Mascota.objects.all()
-    return render(request, 'veterinaria/vista_mascotas_todas.html', {'mascotas': mascotas})
 
 
 @login_required
@@ -270,14 +236,3 @@ def detalle_consultas(request, mascota_id):
         mascota = get_object_or_404(Mascota, id=mascota_id, dueño=request.user)
     consultas = mascota.consultas.all()
     return render(request, 'veterinaria/detalle_consultas.html', {'mascota': mascota, 'consultas': consultas})
-
-
-@staff_member_required
-def vista_mascotas_todas(request):
-    mascotas = Mascota.objects.all()
-    return render(request, 'veterinaria/vista_mascotas_todas.html', {'mascotas': mascotas})
-
-
-def publico_mascotas(request):
-    mascotas = Mascota.objects.all()
-    return render(request, 'veterinaria/publico_mascotas.html', {'mascotas': mascotas})
